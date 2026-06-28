@@ -203,10 +203,10 @@
   })
 </script>
 
-<div class="flex flex-col gap-4 py-4 max-w-4xl">
+<div class="flex w-full flex-col gap-4 py-4">
   <!-- Header + Now Playing -->
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-3">
+  <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+    <div class="flex min-w-0 items-center gap-3">
       <div class="h-8 w-8 text-emerald-400">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4"/>
@@ -214,36 +214,41 @@
           <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>
         </svg>
       </div>
-      <h1 class="text-xl font-bold">Radio</h1>
+      <div class="min-w-0">
+        <h1 class="truncate text-xl font-bold xl:text-2xl">Radio</h1>
+        <p class="text-xs text-zinc-400 xl:text-sm">Worldwide stations with live search, favorites, and endless scroll.</p>
+      </div>
     </div>
 
     {#if currentStation && $radioPlaying}
-      <div class="flex items-center gap-3 bg-zinc-800 rounded-lg px-3 py-2">
+      <div class="flex items-center gap-3 rounded-xl bg-zinc-800 px-3 py-2 xl:max-w-[40%] xl:min-w-[320px]">
         {#if currentStation.favicon}
           <img src={currentStation.favicon} alt="" class="h-6 w-6 rounded" />
         {/if}
-        <span class="text-sm font-medium truncate max-w-[200px]">{currentStation.name}</span>
-        <button on:click={stopRadio} class="text-red-400 hover:text-red-300 text-xs font-bold">Stop</button>
+        <span class="min-w-0 flex-1 truncate text-sm font-medium">{currentStation.name}</span>
+        <button on:click={stopRadio} class="shrink-0 text-red-400 hover:text-red-300 text-xs font-bold">Stop</button>
       </div>
     {/if}
   </div>
 
   <audio bind:this={audioEl} preload="none"></audio>
 
-  <!-- Search -->
-  <div class="flex gap-2">
-    <input
-      type="text"
-      bind:value={searchQuery}
-      on:keydown={handleKey}
-      placeholder="Search stations worldwide..."
-      class="flex-1 bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-sm outline-none focus:border-emerald-500"
-    />
-    <button on:click={searchStations} class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded text-sm font-medium">Search</button>
-  </div>
+  <div class="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] xl:items-start">
+    <div class="flex flex-col gap-4">
+      <!-- Search -->
+      <div class="flex flex-col gap-2 sm:flex-row">
+        <input
+          type="text"
+          bind:value={searchQuery}
+          on:keydown={handleKey}
+          placeholder="Search stations worldwide..."
+          class="min-w-0 flex-1 bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-sm outline-none focus:border-emerald-500"
+        />
+        <button on:click={searchStations} class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded text-sm font-medium sm:min-w-[110px]">Search</button>
+      </div>
 
-  <!-- Quick Filters -->
-  <div class="flex gap-2 flex-wrap text-xs">
+      <!-- Quick Filters -->
+      <div class="flex gap-2 flex-wrap text-xs">
     <button on:click={() => { view = "browse"; loadByCountry("NO") }}
       class="px-3 py-1.5 rounded-full {selectedCountry === 'NO' ? 'bg-emerald-600' : 'bg-zinc-800 hover:bg-zinc-700'}">
       Norway
@@ -276,33 +281,83 @@
       class="px-3 py-1.5 rounded-full {view === 'favorites' ? 'bg-yellow-600' : 'bg-zinc-800 hover:bg-zinc-700'}">
       Favorites
     </button>
-  </div>
+      </div>
 
-  <!-- All Countries (toggled by "..." button) -->
-  {#if showAllCountries && countries.length > 0}
-    <div class="flex gap-1.5 flex-wrap text-xs max-h-40 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-lg p-3">
-      {#each countries as c}
-        {#if c.stationcount > 0}
-          <button on:click={() => { view = "browse"; showAllCountries = false; loadByCountry(c.iso_3166_1 || c.name) }}
-            class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 whitespace-nowrap">
-            {c.name} <span class="text-zinc-500">({c.stationcount})</span>
-          </button>
+      <!-- All Countries (toggled by "..." button) -->
+      {#if showAllCountries && countries.length > 0}
+        <div class="flex gap-1.5 flex-wrap text-xs max-h-48 overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-lg p-3">
+          {#each countries as c}
+            {#if c.stationcount > 0}
+              <button on:click={() => { view = "browse"; showAllCountries = false; loadByCountry(c.iso_3166_1 || c.name) }}
+                class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 whitespace-nowrap">
+                {c.name} <span class="text-zinc-500">({c.stationcount})</span>
+              </button>
+            {/if}
+          {/each}
+        </div>
+      {/if}
+
+      <!-- Tags -->
+      {#if tags.length > 0}
+        <div class="flex gap-1.5 flex-wrap text-xs rounded-xl bg-zinc-900/50 border border-zinc-800 p-3">
+          {#each tags.slice(0, 15) as tag}
+            <button on:click={() => { view = "browse"; loadByTag(tag.name) }}
+              class="px-2 py-1 rounded {selectedTag === tag.name ? 'bg-blue-600' : 'bg-zinc-800/50 hover:bg-zinc-700/50'}">
+              {tag.name}
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </div>
+
+    <div class="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4 xl:sticky xl:top-4">
+      <div class="flex items-start gap-3">
+        {#if currentStation?.favicon}
+          <img src={currentStation.favicon} alt="" class="h-14 w-14 rounded-lg object-cover shrink-0" />
+        {:else}
+          <div class="h-14 w-14 rounded-lg bg-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-400 shrink-0">FM</div>
         {/if}
-      {/each}
-    </div>
-  {/if}
 
-  <!-- Tags -->
-  {#if tags.length > 0}
-    <div class="flex gap-1.5 flex-wrap text-xs">
-      {#each tags.slice(0, 15) as tag}
-        <button on:click={() => { view = "browse"; loadByTag(tag.name) }}
-          class="px-2 py-1 rounded {selectedTag === tag.name ? 'bg-blue-600' : 'bg-zinc-800/50 hover:bg-zinc-700/50'}">
-          {tag.name}
+        <div class="min-w-0 flex-1">
+          <p class="text-[11px] uppercase tracking-[0.18em] text-zinc-500 font-bold">Current station</p>
+          <h2 class="truncate text-lg font-bold">{currentStation?.name || 'No station selected'}</h2>
+          <p class="mt-1 text-sm text-zinc-400 line-clamp-2">{currentStation ? `${currentStation.country || ''}${currentStation.tags ? ' · ' + currentStation.tags : ''}${currentStation.bitrate ? ' · ' + currentStation.bitrate + 'kbps' : ''}` : 'Pick a station from the list to start listening.'}</p>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center gap-2">
+        <button
+          on:click={() => currentStation && playStation(currentStation)}
+          class="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-4 py-2.5 text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={!currentStation}
+        >
+          {$radioPlaying ? 'Playing' : 'Play'}
         </button>
-      {/each}
+        <button
+          on:click={stopRadio}
+          class="rounded-lg border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 px-4 py-2.5 text-sm font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={!$radioPlaying}
+        >
+          Stop
+        </button>
+      </div>
+
+      <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-lg bg-black/20 px-2 py-3">
+          <div class="text-[10px] uppercase tracking-[0.16em] text-zinc-500 font-bold">Stations</div>
+          <div class="mt-1 text-lg font-bold">{stations.length}</div>
+        </div>
+        <div class="rounded-lg bg-black/20 px-2 py-3">
+          <div class="text-[10px] uppercase tracking-[0.16em] text-zinc-500 font-bold">Saved</div>
+          <div class="mt-1 text-lg font-bold">{favorites.length}</div>
+        </div>
+        <div class="rounded-lg bg-black/20 px-2 py-3">
+          <div class="text-[10px] uppercase tracking-[0.16em] text-zinc-500 font-bold">Mode</div>
+          <div class="mt-1 text-sm font-bold truncate">{view === 'favorites' ? 'Saved' : selectedCountry ? selectedCountry : selectedTag || 'Top'}</div>
+        </div>
+      </div>
     </div>
-  {/if}
+  </div>
 
   <!-- Station List -->
   {#if loading}
@@ -311,11 +366,11 @@
     {#if favorites.length === 0}
       <p class="text-zinc-500 text-center py-8">No favorites yet. Click the star on any station.</p>
     {:else}
-      <div class="grid gap-2">
+      <div class="grid min-w-0 gap-2">
         {#each favorites as fav}
           <button
             on:click={() => playStation({ stationuuid: fav.station_uuid, name: fav.name, url_resolved: fav.url, favicon: fav.favicon, country: fav.country, tags: fav.tags })}
-            class="flex items-center gap-3 p-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition text-left"
+            class="min-w-0 flex items-center gap-3 p-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition text-left"
           >
             {#if fav.favicon}
               <img src={fav.favicon} alt="" class="h-8 w-8 rounded object-cover" />
@@ -334,9 +389,9 @@
       </div>
     {/if}
   {:else}
-    <div class="grid gap-2">
-      {#each stations as station}
-        <div class="flex items-center gap-3 p-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition">
+      <div class="grid min-w-0 gap-2">
+        {#each stations as station}
+        <div class="min-w-0 flex items-center gap-3 p-3 rounded-lg bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition overflow-hidden">
           <button on:click={() => playStation(station)} class="flex items-center gap-3 flex-1 min-w-0 text-left">
             {#if station.favicon}
               <img src={station.favicon} alt="" class="h-8 w-8 rounded object-cover" />
@@ -345,7 +400,7 @@
             {/if}
             <div class="flex-1 min-w-0">
               <p class="font-medium text-sm truncate">{station.name}</p>
-              <p class="text-xs text-zinc-400 truncate">
+              <p class="min-w-0 text-xs text-zinc-400 truncate">
                 {station.country || ''}{station.tags ? ' · ' + station.tags : ''}{station.bitrate ? ' · ' + station.bitrate + 'kbps' : ''}
               </p>
             </div>
@@ -357,7 +412,7 @@
 
           <button
             on:click={() => toggleFavorite(station)}
-            class="text-lg {isFav(station) ? 'text-yellow-400' : 'text-zinc-600 hover:text-yellow-400'} transition"
+            class="shrink-0 text-lg {isFav(station) ? 'text-yellow-400' : 'text-zinc-600 hover:text-yellow-400'} transition"
             title={isFav(station) ? "Remove from favorites" : "Add to favorites"}
           >
             {isFav(station) ? '★' : '☆'}
