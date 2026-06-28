@@ -2,6 +2,10 @@ export const baseURL = "https://www.jiosaavn.com/api.php?_format=json&_marker=0&
 export const proxyURL = "raga-backend.valiantlynx.com"
 export const proxyEnabled = true
 
+// Radio configuration
+export const radioBackendURL = "http://localhost:3080"
+export const radioStreamURL = "http://localhost:8000/stream.mp3"
+
 export const sub = Object.freeze({
   search: {
     all: '&__call=autocomplete.get',
