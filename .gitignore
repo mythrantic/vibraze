@@ -5,3 +5,5 @@ pnpm-lock.yaml
 package-lock.json
 build
 bun.lockb
+dokploy-mcp/
+opencode.json
