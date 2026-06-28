@@ -14,6 +14,7 @@
     import Explore from '$lib/icons/sidebar/Explore.svelte'
     import New from '$lib/icons/sidebar/New.svelte'
     import TopCharts from '$lib/icons/sidebar/TopCharts.svelte'
+    import Radio from '$lib/icons/sidebar/Radio.svelte'
 
     import More from '$lib/icons/sidebar/More.svelte'
     import History from '$lib/icons/sidebar/History.svelte'
@@ -29,6 +30,7 @@
     let exploreBtns = [
         {id: "New", link: "newreleases", comp: New},
         {id: "Charts", link: "topcharts", comp: TopCharts},
+        {id: "Radio", link: "radio", comp: Radio},
     ]
 
     let moreBtns = [
