@@ -3,8 +3,8 @@ export const proxyURL = "raga-backend.valiantlynx.com"
 export const proxyEnabled = true
 
 // Radio configuration
-export const radioBackendURL = "http://localhost:3080"
-export const radioStreamURL = "http://localhost:8000/stream.mp3"
+export const radioBackendURL = "https://vibraze-backend.valiantlynx.com"
+export const radioStreamURL = "https://vibraze-backend.valiantlynx.com/stream.mp3"
 
 export const sub = Object.freeze({
   search: {
